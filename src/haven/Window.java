@@ -26,6 +26,7 @@
 
 package haven;
 
+import haven.automated.InventorySorter;
 import haven.automated.StackAllItems;
 import haven.automated.UnstackAllItems;
 import haven.automated.mapper.MappingClient;
@@ -88,6 +89,10 @@ public class Window extends Widget {
     Resource.loadsimg("gfx/hud/wnd/lg/unstackbtnu"),
     Resource.loadsimg("gfx/hud/wnd/lg/unstackbtnd"),
     Resource.loadsimg("gfx/hud/wnd/lg/unstackbtnh")};
+    private static final BufferedImage[] sortbtni = new BufferedImage[] {
+    Resource.loadsimg("gfx/hud/wnd/lg/sortbtnu"),
+    Resource.loadsimg("gfx/hud/wnd/lg/sortbtnd"),
+    Resource.loadsimg("gfx/hud/wnd/lg/sortbtnh")};
 	private static final BufferedImage[] extlistbtni = new BufferedImage[] {
     Resource.loadsimg("gfx/hud/wnd/lg/qlistbtnu"),
     Resource.loadsimg("gfx/hud/wnd/lg/qlistbtnd"),
@@ -156,6 +161,8 @@ public class Window extends Widget {
 				((DefaultDeco) deco).extlistbtn.visible = ((DefaultDeco) deco).findExtInventory() != null;;
             if (((DefaultDeco) deco).unstackbtn != null)
                 ((DefaultDeco) deco).unstackbtn.visible = true;
+            if (((DefaultDeco) deco).sortbtn != null)
+                ((DefaultDeco) deco).sortbtn.visible = true;
         }
     }
 
@@ -218,7 +225,7 @@ public class Window extends Widget {
 								   UI.rscale(0.75), UI.rscale(1.0), Color.BLACK);
 	public final boolean lg;
 	public final IButton cbtn;
-    public IButton extlistbtn, stackbtn, unstackbtn;
+    public IButton extlistbtn, stackbtn, unstackbtn, sortbtn;
 	public boolean dragsize, cfocus;
 	public Area aa, ca;
 	public Coord cptl = Coord.z, cpsz = Coord.z;
@@ -249,14 +256,16 @@ public class Window extends Widget {
 		int anchor = sz.x - extra;
 		cbtn.c = Coord.of(anchor - cbtn.sz.x - UI.scale(9), -UI.scale(10));
 		if (extlistbtn != null)
-			extlistbtn.c = Coord.of(anchor - cbtn.sz.x - UI.scale(78), -UI.scale(10));
+			extlistbtn.c = Coord.of(anchor - cbtn.sz.x - UI.scale(68), -UI.scale(10));
 		if (stackbtn != null)
-			stackbtn.c = Coord.of(anchor - cbtn.sz.x - UI.scale(59), -UI.scale(10));
+			stackbtn.c = Coord.of(anchor - cbtn.sz.x - UI.scale(49), -UI.scale(10));
 		if (unstackbtn != null)
-			unstackbtn.c = Coord.of(anchor - cbtn.sz.x - UI.scale(40), -UI.scale(10));
+			unstackbtn.c = Coord.of(anchor - cbtn.sz.x - UI.scale(30), -UI.scale(10));
+        if (sortbtn != null)
+            sortbtn.c = Coord.of(anchor - cbtn.sz.x - UI.scale(90), - UI.scale(10));
 		cpsz = Coord.of((int)(wsz.x*0.95), cm.sz().y).sub(cptl); // ND: changed this to make the window top bar fully draggable WHEN RESIZED (for instance, buddy window)
 	}
-	
+
 	public Area contarea() {
 	    return(aa);
 	}
@@ -426,7 +435,7 @@ public class Window extends Widget {
 				ext.togglePanel();
 			}
 		});
-		extlistbtn.settip("Quality List");
+		extlistbtn.settip("Extended View");
 		extlistbtn.visible = false;
 	}
 
@@ -443,6 +452,23 @@ public class Window extends Widget {
 		stackbtn.settip("Stack All");
 		stackbtn.visible = false;
 	}
+
+    public void addSortBtn() {
+        sortbtn = add(new IButton(sortbtni[0], sortbtni[1], sortbtni[2])).action(() -> {
+            for (Widget wdg = this; wdg != null; wdg = wdg.next) {
+                if (wdg instanceof Inventory) {
+                    InventorySorter.sort((Inventory) wdg);
+                    break;
+                }
+                if (wdg instanceof ExtInventory) {
+                    InventorySorter.sort(((ExtInventory) wdg).inv);
+                    break;
+                }
+            }
+        });
+        sortbtn.settip("Sort All");
+        sortbtn.visible = false;
+    }
 
     public void addUnstackBtn() {
 		if (unstackbtn != null)
@@ -879,6 +905,11 @@ public class Window extends Widget {
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
+                    try {
+                        ((DefaultDeco) deco).addSortBtn();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
 					if (child instanceof ExtInventory) {
 						try {
 							((DefaultDeco) deco).addExtListBtn();

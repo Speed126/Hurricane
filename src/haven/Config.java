@@ -40,7 +40,7 @@ public class Config {
     public static final String confid = "Hurricane";
     public static final Variable<Boolean> par = Variable.def(() -> true);
     public final Properties localprops = getlocalprops();
-	public static final String clientVersion = "v1.56b";
+	public static final String clientVersion = "v1.57";
 	public static String githubLatestVersion = "Loading...";
 
     private static Config global = null;
@@ -424,6 +424,7 @@ public class Config {
 			"gfx/kritter/woodworm/woodworm",
 			"gfx/kritter/whirlingsnowflake/whirlingsnowflake",
 			"gfx/kritter/bullfinch/bullfinch",
+            "gfx/kritter/dumbledore/dumbledore",
 
 			"gfx/terobjs/items/grub", // ND: lmao
 			"gfx/terobjs/items/hoppedcow",
